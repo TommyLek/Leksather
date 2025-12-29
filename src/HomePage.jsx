@@ -32,10 +32,10 @@ export default function HomePage() {
             <p>Kommande händelser och aktiviteter</p>
           </Link>
           
-          <div className="card">
+          <Link to="/photos" className="card">
             <h3>📸 Fotoalbum</h3>
             <p>Delade bilder och minnen</p>
-          </div>
+          </Link>
           
           <div className="card">
             <h3>📝 Anteckningar</h3>

@@ -77,7 +77,23 @@ export function AuthProvider({ children }) {
 
       // Hämta access token för Calendar API
       const credential = GoogleAuthProvider.credentialFromResult(result);
+
+      // Debug: Kontrollera vilka scopes token faktiskt har
       if (credential?.accessToken) {
+        // Anropa Google för att se token-info
+        try {
+          const tokenInfoResponse = await fetch(
+            `https://oauth2.googleapis.com/tokeninfo?access_token=${credential.accessToken}`
+          );
+          const tokenInfo = await tokenInfoResponse.json();
+          console.log('=== TOKEN SCOPES ===');
+          console.log('Granted scopes:', tokenInfo.scope);
+          console.log('Full token info:', tokenInfo);
+          console.log('====================');
+        } catch (e) {
+          console.error('Could not fetch token info:', e);
+        }
+
         setCalendarAccessToken(credential.accessToken);
       }
 

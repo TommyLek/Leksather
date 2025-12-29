@@ -4,6 +4,8 @@
 
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
+import { getStorage } from 'firebase/storage';
+import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: "AIzaSyDcMUnljxDihJgC0bwtmyQJRBVlfn1Y2Lk",
@@ -26,5 +28,9 @@ googleProvider.addScope('https://www.googleapis.com/auth/calendar');
 
 // Kalender-ID för familjens delade kalender
 export const FAMILY_CALENDAR_ID = 'bd465e9554e5d27962d1f91210de0bd158dc49a6425602424cca4416550d892b@group.calendar.google.com';
+
+// Initiera Storage och Firestore
+export const storage = getStorage(app);
+export const db = getFirestore(app);
 
 export default app;

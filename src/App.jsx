@@ -4,6 +4,7 @@ import ProtectedRoute from './ProtectedRoute'
 import LoginPage from './LoginPage'
 import HomePage from './HomePage'
 import CalendarPage from './CalendarPage'
+import PhotoAlbumPage from './PhotoAlbumPage'
 
 export default function App() {
   const { loading } = useAuth()
@@ -33,6 +34,14 @@ export default function App() {
         element={
           <ProtectedRoute>
             <CalendarPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/photos"
+        element={
+          <ProtectedRoute>
+            <PhotoAlbumPage />
           </ProtectedRoute>
         }
       />

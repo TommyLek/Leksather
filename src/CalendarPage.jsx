@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useCalendar } from './hooks/useCalendar';
 import { useAuth } from './AuthContext';
+import { getSwedishHolidays } from './utils/swedishHolidays';
 
 export default function CalendarPage() {
   const { user } = useAuth();
@@ -31,6 +32,30 @@ export default function CalendarPage() {
   const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
   const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
   const adjustedFirstDay = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1; // Måndag = 0
+
+  // Hämta svenska helgdagar för aktuellt år
+  const holidays = useMemo(() => {
+    return getSwedishHolidays(currentDate.getFullYear());
+  }, [currentDate.getFullYear()]);
+
+  // Beräkna ISO veckonummer
+  const getWeekNumber = (date) => {
+    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  };
+
+  // Hämta veckonummer för en dag i månaden
+  const getWeekNumberForDay = (day) => {
+    return getWeekNumber(new Date(currentDate.getFullYear(), currentDate.getMonth(), day));
+  };
+
+  const getHolidayForDay = (day) => {
+    const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    return holidays.find(h => h.date === dateStr);
+  };
 
   const monthNames = ['Januari', 'Februari', 'Mars', 'April', 'Maj', 'Juni',
     'Juli', 'Augusti', 'September', 'Oktober', 'November', 'December'];
@@ -169,45 +194,84 @@ export default function CalendarPage() {
         <div className="calendar-loading">Laddar händelser...</div>
       ) : (
         <div className="calendar-grid">
+          <div className="calendar-week-header">V</div>
           {dayNames.map(day => (
             <div key={day} className="calendar-day-header">{day}</div>
           ))}
 
-          {Array.from({ length: adjustedFirstDay }).map((_, i) => (
-            <div key={`empty-${i}`} className="calendar-day empty"></div>
-          ))}
+          {(() => {
+            const cells = [];
+            let currentWeek = null;
 
-          {Array.from({ length: daysInMonth }).map((_, i) => {
-            const day = i + 1;
-            const dayEvents = getEventsForDay(day);
-            return (
-              <div
-                key={day}
-                className={`calendar-day ${isToday(day) ? 'today' : ''}`}
-                onClick={() => openCreateModal(day)}
-              >
-                <span className="day-number">{day}</span>
-                <div className="day-events">
-                  {dayEvents.slice(0, 3).map(event => (
-                    <div
-                      key={event.id}
-                      className="event-dot"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openEditModal(event);
-                      }}
-                      title={event.summary}
-                    >
-                      {event.summary}
+            // Tomma celler i början
+            if (adjustedFirstDay > 0) {
+              // Veckonummer för första dagen
+              const firstDayWeek = getWeekNumberForDay(1);
+              cells.push(
+                <div key="week-0" className="calendar-week-number">{firstDayWeek}</div>
+              );
+              for (let i = 0; i < adjustedFirstDay; i++) {
+                cells.push(<div key={`empty-${i}`} className="calendar-day empty"></div>);
+              }
+              currentWeek = firstDayWeek;
+            }
+
+            // Dagar i månaden
+            for (let day = 1; day <= daysInMonth; day++) {
+              const dayOfWeek = (adjustedFirstDay + day - 1) % 7;
+              const weekNum = getWeekNumberForDay(day);
+
+              // Ny vecka börjar (måndag)
+              if (dayOfWeek === 0) {
+                cells.push(
+                  <div key={`week-${day}`} className="calendar-week-number">{weekNum}</div>
+                );
+              } else if (day === 1 && adjustedFirstDay === 0) {
+                // Första dagen är en måndag
+                cells.push(
+                  <div key={`week-${day}`} className="calendar-week-number">{weekNum}</div>
+                );
+              }
+
+              const dayEvents = getEventsForDay(day);
+              const holiday = getHolidayForDay(day);
+
+              cells.push(
+                <div
+                  key={day}
+                  className={`calendar-day ${isToday(day) ? 'today' : ''} ${holiday ? 'holiday' : ''}`}
+                  onClick={() => openCreateModal(day)}
+                >
+                  <span className="day-number">{day}</span>
+                  {holiday && (
+                    <div className="holiday-name" title={holiday.name}>
+                      {holiday.name}
                     </div>
-                  ))}
-                  {dayEvents.length > 3 && (
-                    <div className="event-more">+{dayEvents.length - 3} till</div>
                   )}
+                  <div className="day-events">
+                    {dayEvents.slice(0, holiday ? 2 : 3).map(event => (
+                      <div
+                        key={event.id}
+                        className="event-dot"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openEditModal(event);
+                        }}
+                        title={event.summary}
+                      >
+                        {event.summary}
+                      </div>
+                    ))}
+                    {dayEvents.length > (holiday ? 2 : 3) && (
+                      <div className="event-more">+{dayEvents.length - (holiday ? 2 : 3)} till</div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            }
+
+            return cells;
+          })()}
         </div>
       )}
 

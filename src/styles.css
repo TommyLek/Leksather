@@ -285,11 +285,32 @@ body {
 
 .calendar-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: 40px repeat(7, 1fr);
   gap: 4px;
   padding: 0 20px 20px;
-  max-width: 1000px;
+  max-width: 1050px;
   margin: 0 auto;
+}
+
+.calendar-week-header {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  padding: 10px 4px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  border-radius: 8px 8px 0 0;
+}
+
+.calendar-week-number {
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border-radius: 4px;
 }
 
 .calendar-day-header {
@@ -328,6 +349,24 @@ body {
 .calendar-day.today {
   background: #e8f4fd;
   border: 2px solid #4285f4;
+}
+
+.calendar-day.holiday {
+  background: #fff5f5;
+}
+
+.calendar-day.holiday.today {
+  background: linear-gradient(135deg, #e8f4fd 50%, #fff5f5 50%);
+}
+
+.holiday-name {
+  font-size: 0.65rem;
+  color: #c53030;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
 }
 
 .day-number {
@@ -498,6 +537,286 @@ a.card {
   display: block;
 }
 
+/* Photo Album Page */
+.photos-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  overflow-y: auto;
+}
+
+.photos-header {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.photos-header h1 {
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.photos-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.upload-btn {
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.upload-btn:hover {
+  background: #5a67d8;
+}
+
+.upload-btn:disabled {
+  background: #a0aec0;
+  cursor: not-allowed;
+}
+
+.photos-notice {
+  background: #fff3cd;
+  color: #856404;
+  padding: 12px 24px;
+  text-align: center;
+}
+
+.photos-error {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 12px 24px;
+  text-align: center;
+}
+
+.photos-info {
+  padding: 12px 24px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+}
+
+.photos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px;
+  padding: 0 24px 24px;
+}
+
+.photo-item {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.photo-item:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.photo-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.video-indicator {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.photos-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px;
+  color: white;
+}
+
+.photos-empty {
+  text-align: center;
+  padding: 60px 24px;
+  color: white;
+}
+
+.photos-empty p {
+  margin-bottom: 20px;
+  font-size: 1.1rem;
+}
+
+.photos-load-more {
+  text-align: center;
+  padding: 20px;
+}
+
+.load-more-btn {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.load-more-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Lightbox */
+.lightbox {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 40px;
+  cursor: pointer;
+  z-index: 1001;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.lightbox-close:hover {
+  opacity: 1;
+}
+
+.lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  font-size: 48px;
+  padding: 20px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s, background 0.2s;
+}
+
+.lightbox-nav:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.lightbox-nav:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+}
+
+.lightbox-prev {
+  left: 0;
+  border-radius: 0 8px 8px 0;
+}
+
+.lightbox-next {
+  right: 0;
+  border-radius: 8px 0 0 8px;
+}
+
+.lightbox-content {
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.lightbox-media {
+  max-width: 100%;
+  max-height: 80vh;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+.lightbox-info {
+  text-align: center;
+  padding: 16px;
+  color: white;
+}
+
+.lightbox-date {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.lightbox-description {
+  margin-top: 8px;
+  font-size: 1rem;
+}
+
+/* Upload Modal */
+.upload-modal {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 450px;
+  text-align: center;
+}
+
+.upload-modal.drag-active {
+  border: 3px dashed #667eea;
+  background: #f0f4ff;
+}
+
+.upload-modal h3 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.upload-area {
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  padding: 40px 20px;
+  margin-bottom: 16px;
+}
+
+.upload-area p {
+  color: #666;
+  margin-bottom: 12px;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
   .header {
@@ -521,6 +840,12 @@ a.card {
   .calendar-grid {
     padding: 0 10px 20px;
     gap: 2px;
+    grid-template-columns: 28px repeat(7, 1fr);
+  }
+
+  .calendar-week-header,
+  .calendar-week-number {
+    font-size: 0.7rem;
   }
 
   .calendar-day {
@@ -542,6 +867,10 @@ a.card {
     padding: 1px 4px;
   }
 
+  .holiday-name {
+    font-size: 0.55rem;
+  }
+
   .form-row {
     flex-direction: column;
     gap: 0;
@@ -554,5 +883,30 @@ a.card {
   .btn-delete {
     width: 100%;
     margin-bottom: 10px;
+  }
+
+  .photos-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 4px;
+    padding: 0 8px 16px;
+  }
+
+  .photos-header {
+    padding: 12px 16px;
+  }
+
+  .photos-header h1 {
+    font-size: 1.2rem;
+  }
+
+  .lightbox-nav {
+    font-size: 32px;
+    padding: 12px;
+  }
+
+  .lightbox-close {
+    font-size: 32px;
+    top: 10px;
+    right: 10px;
   }
 }
